@@ -1,5 +1,5 @@
 import * as React from "react";
-// import { useNavigate } from "react-router-dom";
+
 import { styled, useTheme } from "@mui/material/styles";
 import { Stack, Avatar } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -103,18 +103,18 @@ const Sidebar = ({ user }) => {
     window.open("https://localhost3000/main/logout", "_self");
   }
 
-  // const navigate = useNavigate();
+
 
   const items = [
     {
       text: "Overview",
       icon: <Dashboard />,
-      click: () => navigate("/dashboard"),
+      click: () => "/dashboard",
     },
     {
       text: "Transactions",
       icon: <AttachMoney />,
-      click: () => navigate("/transactions"),
+      click: () => "/transactions",
     },
     { text: "Logout", icon: <Logout />, click: logout },
   ];

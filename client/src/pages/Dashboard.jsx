@@ -9,7 +9,7 @@ import { Container, Box, Button, Stack, Grid } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import Selector from "../components/Selector";
 
-axios.defaults.baseURL = "http://localhost:3000/dashboard";
+axios.defaults.baseURL = "http://localhost:3001/dashboard";
 
 const Dashboard = ({
   user,

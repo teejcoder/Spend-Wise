@@ -5,7 +5,7 @@ import axios from "axios";
 import Table from "../components/Table";
 import { Box, Typography, Container } from "@mui/material";
 
-axios.defaults.baseURL = "http://localhost:3000/transactions";
+axios.defaults.baseURL = "http://localhost:3001/transactions";
 
 const Transactions = ({ user, data }) => {
     const [transactions, setTransactions] = useState([]);

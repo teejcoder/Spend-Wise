@@ -3,7 +3,7 @@ import logo from "../assets/squidward.jpg";
 
 const Home = () => {
   function google() {
-    window.open("/http://localhost3000/", "_self");
+    window.open("/http://localhost3001/");
   }
 
   return (
