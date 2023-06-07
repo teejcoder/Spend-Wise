@@ -13,11 +13,11 @@ const Auth = ({ publicToken, user, metadata }) => {
         });
         console.log(account);
 
-        // const auth = await axios.post("api/auth", {
-        //   access_token: accessToken.data.accessToken,
-        // });
-        // setAccount(auth.data.numbers.ach[0]);
-        // console.log(account);
+        const auth = await axios.post("api/auth", {
+          access_token: accessToken.data.accessToken,
+        });
+        setAccount(auth.data.numbers.ach[0]);
+        console.log(account);
       } catch (err) {
         console.log(err);
       }

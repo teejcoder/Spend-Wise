@@ -2,9 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import App from './App';
-import Home from '../src/pages/Home'
-import Login from '../src/pages/Login'
-import Header from '../src/components/Header'
+import Home from './pages/Home'
+import Login from './pages/Login'
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 
@@ -16,7 +15,6 @@ root.render(
     <App />
       <App />
       <Home />
-      <Header />
       <Dashboard />
       <Transactions /> 
       <Login />

@@ -13,9 +13,11 @@ const connectDB = require("./config/database");
 const mainRoutes = require("./routes/main");
 const apiRoutes = require("./routes/api");
 const path = require('path');
+const dotenv = require('dotenv')
 
 // Use .env file in config folder
 require("dotenv").config({ path: "./config/.env" });
+app.set('view engine', 'ejs');
 
 // Passport config
 require("./config/passport")(passport);
@@ -51,8 +53,8 @@ app.use(passport.session());
 app.use(flash());
 
 // Setup Routes for which the server is listening
+app.use("/", mainRoutes);
 app.use("/api", apiRoutes)
-app.use("/main", mainRoutes);
 
 
 // Serve the React app for any other routes
@@ -61,7 +63,7 @@ app.get('/', (req, res) => {
 });
 
 // Server Running
-app.set('view engine', 'react');
+
 app.listen(process.env.PORT, () => {
   console.log("Server is running, you better catch it!");
 });

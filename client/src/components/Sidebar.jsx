@@ -155,7 +155,7 @@ const Sidebar = ({ user }) => {
             justifyContent="center"
           >
             <Typography color="black" variant="h6" noWrap component="div">
-              {user.firstName}
+              {user?.firstName}
             </Typography>
             <Avatar src={user?.avatar} />
           </Stack>

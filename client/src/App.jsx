@@ -50,6 +50,7 @@ function App() {
                     <br />
                     <br />
                     <button onClick={logOut}>Log out</button>
+                    <button onClick={() => Dashboard()}>go to dashboard </button>
                 </div>
             ) : (
                 <button onClick={() => login()}>Sign in with Google 🚀 </button>

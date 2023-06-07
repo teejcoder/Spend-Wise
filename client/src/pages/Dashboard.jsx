@@ -28,7 +28,7 @@ const Dashboard = ({
     let ignore = false;
 
     async function fetchAccounts() {
-      const accounts = await axios.get(`/api/accounts/${user._id}`);
+      const accounts = await axios.get(`/api/accounts/${user.id}`);
       if (!ignore) {
         setAccount(accounts.data);
       }
