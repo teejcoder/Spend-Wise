@@ -1,23 +1,92 @@
 const express = require("express");
-const app = express();
 const mongoose = require("mongoose");
 const passport = require("passport");
+const flash = require("express-flash");
 const session = require("express-session");
 const MongoStore = require("connect-mongo")(session);
-const methodOverride = require("method-override");
-const flash = require("express-flash");
+const methodOverride = require("method-override")
 const logger = require("morgan");
-const moment = require("moment");
-const plaid = require("plaid")
+const cors = require("cors");
 const connectDB = require("./config/database");
 const mainRoutes = require("./routes/main");
-const apiRoutes = require("./routes/api");
-const path = require('path');
-const dotenv = require('dotenv')
-
-// Use .env file in config folder
+// const apiRoutes = require("./routes/api");
 require("dotenv").config({ path: "./config/.env" });
-app.set('view engine', 'ejs');
+const { Configuration, PlaidApi, PlaidEnvironments } = require('plaid')
+
+const PORT = 3000;
+
+const app = express();
+
+const configuration = new Configuration({
+  basePath: PlaidEnvironments.sandbox,
+  baseOptions: {
+    headers: {
+      'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
+      'PLAID-SECRET': process.env.PLAID_SECRET,
+    },
+  },
+});
+
+const plaidClient = new PlaidApi(configuration);
+
+
+app.post('/create_link_token', async function (request, response) {
+  const plaidRequest = {
+    user: {
+      client_user_id: 'user',
+    },
+    client_name: 'Plaid Test App',
+    products: ['auth'],
+    language: 'en',
+    redirect_uri: 'http://localhost:3000/',
+    country_codes: ['US'],
+  };
+  try {
+    const createTokenResponse = await plaidClient.linkTokenCreate(plaidRequest);
+    response.json(createTokenResponse.data);
+  } catch (error) {
+    console.error(error)
+  }
+});
+
+app.post("/auth", async function(request, response) {
+  try {
+      const access_token = request.body.access_token;
+      const plaidRequest = {
+          access_token: access_token,
+      };
+      const plaidResponse = await plaidClient.authGet(plaidRequest);
+      response.json(plaidResponse.data);
+  } catch (e) {
+      response.status(500).send("failed");
+  }
+});
+
+app.post('/exchange_public_token', async function (
+   request,
+   response,
+   next,
+) {
+   const publicToken = request.body.public_token;
+   try {
+       const plaidResponse = await plaidClient.itemPublicTokenExchange({
+           public_token: publicToken,
+       });
+       // These values should be saved to a persistent database and
+       // associated with the currently signed-in user
+       const accessToken = plaidResponse.data.access_token;
+       response.json({ accessToken });
+   } catch (error) {
+       response.status(500).send("failed");
+   }
+});
+
+
+
+
+
+
+app.use(cors());
 
 // Passport config
 require("./config/passport")(passport);
@@ -32,10 +101,8 @@ app.use(express.json());
 // Logging
 app.use(logger("dev"));
 
-// Use forms for put / delete
 app.use(methodOverride("_method"));
 
-// Setup Sessions - stored in MongoDB
 app.use(
   session({
     secret: "keyboard cat",
@@ -45,25 +112,16 @@ app.use(
   })
 );
 
-// Passport middleware
+//sessions
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Use flash messages for errors, info, etc.
 app.use(flash());
 
-// Setup Routes for which the server is listening
 app.use("/", mainRoutes);
-app.use("/api", apiRoutes)
+// app.use("/api", apiRoutes);
 
-
-// Serve the React app for any other routes
-app.get('/', (req, res) => {
-  res.render('')
-});
-
-// Server Running
 
 app.listen(process.env.PORT, () => {
-  console.log("Server is running, you better catch it!");
+  console.log(`Server is running on ${PORT}, you better catch it!`);
 });

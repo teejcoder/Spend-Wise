@@ -1,52 +1,56 @@
 <%- include('partials/header') -%>
-<div class="container">
-  <div class="row mt-5">
-      <div class="col-6">
-          <div>
-              <p><strong>firstname</strong>: <%= user.firstName %></p>
-              <p><strong>Email</strong>: <%= user.email %></p>
-              <a href="/logout" class="col-3 btn btn-primary">Logout</a>
-          </div>
-          <!-- <div class="mt-5">
-            <h2>Add a post</h2>
-            <form action="/post/createPost" enctype="multipart/form-data" method="POST">
-              <div class="mb-3">
-                  <label for="title" class="form-label">Title</label>
-                  <input type="text" class="form-control" id="title" name="title">
-              </div>
-              <div class="mb-3">
-                <label for="caption" class="form-label">Caption</label>
-                <textarea class="form-control" id="caption" name="caption"></textarea>
-              </div>
-              <div class="mb-3">
-                <label for="imgUpload" class="form-label">Image</label>
-                <input type="file" class="form-control" id="imageUpload" name="file">
-              </div>
-              <button type="submit" class="btn btn-primary" value="Upload">Submit</button>
-            </form>
-          </div> -->
-      </div>
-      <div class="col-6">
-        <ul class="row list-unstyled">
-        <% for(var i=0; i<posts.length; i++) {%>
-          <li class="col-6 justify-content-between mt-5">
-            <a href="/post/<%= posts[i]._id%>">
-              <h2><%= posts[i].title%></h2>
-              <img class="img-fluid" src="<%= posts[i].image%>">
-            </a>
-          </li>
-        <% } %>
-        </ul>
-        <div class="row justify-content-center mt-5">
-          <button href="/create_link_token" id="link-button">Link Bank</button>
 
-        </div>  
-      </div>  
-    </div>
-  </div>
-</div>
+<a href="/logout">Logout</a>
 
 
+<button id="link-button">Link Account</button>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+<script type="text/javascript">
+(async function($) {
+  var handler = Plaid.create({
+    // Create a new link_token to initialize Link
+    token: (await $.post('/create_link_token')).link_token,
+    receivedRedirectUri: window.location.href,
+    onLoad: function() {
+      // Optional, called when Link loads
+    },
+    onSuccess: function(public_token, metadata) {
+      // Send the public_token to your app server.
+      // The metadata object contains info about the institution the
+      // user selected and the account ID or IDs, if the
+      // Account Select view is enabled.
+      $.post('/exchange_public_token', {
+        public_token: public_token,
+      });
+    },
+    onExit: function(err, metadata) {
+      // The user exited the Link flow.
+      if (err != null) {
+        // The user encountered a Plaid API error prior to exiting.
+      }
+      // metadata contains information about the institution
+      // that the user selected and the most recent API request IDs.
+      // Storing this information can be helpful for support.
+    },
+    onEvent: function(eventName, metadata) {
+      // Optionally capture Link flow events, streamed through
+      // this callback as your users connect an Item to Plaid.
+      // For example:
+      // eventName = "TRANSITION_VIEW"
+      // metadata  = {
+      //   link_session_id: "123-abc",
+      //   mfa_type:        "questions",
+      //   timestamp:       "2017-09-14T14:42:19.350Z",
+      //   view_name:       "MFA",
+      // }
+    }
+  });
+  $('#link-button').on('click', function(e) {
+    handler.open();
+  });
+})(jQuery);
+</script>
 
 
 
