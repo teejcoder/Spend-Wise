@@ -6,34 +6,13 @@ import { usePlaidLink } from 'react-plaid-link';
 
 axios.defaults.baseURL = "http://localhost:3000"
 
-function PlaidAuth({publicToken}) {
-  const [account, setAccount] = useState();
 
-  useEffect(() => {
-    async function fetchData() {
-
-      let accessToken = await axios.post("/exchange_public_token", {public_token: publicToken});
-      console.log("accessToken", accessToken.data);
-
-      const auth = await axios.post("/auth", {access_token: accessToken.data.accessToken});
-
-      console.log("auth data ", auth.data);
-      setAccount(auth.data.numbers.ach[0], auth.data.account.name);
-    }
-    fetchData();
-  }, []);
-  return account && (
-      <>
-        <p>Account number: {account.account}</p>
-        <p>account name: {account.name}</p>
-        <p>Routing number: {account.routing}</p>
-      </>
-  );
-}
 
 function App() {
   const [linkToken, setLinkToken] = useState();
   const [publicToken, setPublicToken] = useState();
+
+  const [transactions, setTransactions] = useState([]);
 
     useEffect(() => {
 
@@ -56,7 +35,41 @@ function App() {
     <button onClick={() => open()} disabled={!ready}>
       Connect a bank account
     </button>
+
 );
 }
+
+
+
+
+function PlaidAuth({publicToken}) {
+  const [account, setAccount] = useState();
+
+  useEffect(() => {
+    async function fetchData() {
+
+      let accessToken = await axios.post("/exchange_public_token", {public_token: publicToken});
+      console.log("accessToken", accessToken.data);
+
+      const auth = await axios.post("/auth", {access_token: accessToken.data.accessToken});
+
+      console.log("auth data ", auth.data);
+      setAccount(auth.data.numbers.ach[0]);
+    }
+    fetchData();
+  }, []);
+  return account && (
+      <>
+        <p>Account number: {account.account}</p>
+        <p>Routing number: {account.routing}</p>
+      </>
+  );
+}
+
+
+
+
+
+
 
 export default App;

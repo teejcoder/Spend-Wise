@@ -10,9 +10,11 @@ const configuration = new Configuration({
     headers: {
         'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
         'PLAID-SECRET': process.env.PLAID_SECRET,
+        'PLAID-PRODUCTS': process.env.PLAID_PRODUCTS
     },
   },
 });
+
 
 const plaidClient = new PlaidApi(configuration);
 const app = express();
@@ -74,6 +76,59 @@ app.post('/exchange_public_token', async function (
         response.status(500).send("failed");
     }
 });
+
+
+transactions: async (request, response) => {
+    try {
+      const now = moment();
+      const today = now.format("YYYY-MM-DD");
+      const thirtyDaysAgo = now
+        .subtract(30 * request.body.month, "days")
+        .format("YYYY-MM-DD");
+      let transactions = [];
+      const items = request.body.account;
+      const requests = items.map(async (item) => {
+        let accessToken = item.accessToken;
+        let institutionName = item.institutionName;
+        const req = {
+          access_token: accessToken,
+          start_date: thirtyDaysAgo,
+          end_date: today,
+        };
+        const res = await plaidClient.transactionsGet(req);
+        transactions.push({
+          accountName: institutionName,
+          transactions: res.data.transactions,
+          totalTransactions: res.data.total_transactions,
+        });
+      });
+      // requests is an array of promises. Wait for all of them to complete:
+      await Promise.all(requests);
+      response.json(transactions);
+      // transactions is now full.
+
+      // items.forEach((item) => {
+      //   let accessToken = item.accessToken;
+      //   let institutionName = item.institutionName;
+      //   const req = {
+      //     access_token: accessToken,
+      //     start_date: thirtyDaysAgo,
+      //     end_date: today,
+      //   };
+      //   plaidClient.transactionsGet(req).then((res) => {
+      //     transactions.push({
+      //       accountName: institutionName,
+      //       transactions: res.data.transactions,
+      //     });
+      //     if (transactions.length === items.length) {
+      //       response.json(transactions);
+      //     }
+      //   });
+      // });
+    } catch (err) {
+      response.status(500).json({ message: "Could not fetch transaction" });
+    }
+};
 
 
 
