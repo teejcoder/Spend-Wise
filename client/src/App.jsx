@@ -1,21 +1,20 @@
+// import './App.css';
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { usePlaidLink } from 'react-plaid-link';
 
 axios.defaults.baseURL = "http://localhost:3000"
 
-
 function App() {
   const [linkToken, setLinkToken] = useState();
   const [publicToken, setPublicToken] = useState();
 
-    useEffect(() => {
-
-    async function fetch() {
+  useEffect(() => {
+    async function fetchLinkToken() {
       const response = await axios.post("/create_link_token");
       setLinkToken(response.data.link_token)
     }
-    fetch();
+    fetchLinkToken();
   }, []);
 
   const { open, ready } = usePlaidLink({
@@ -25,38 +24,115 @@ function App() {
       console.log("Success", public_token, metadata)
     },
   });
-  
-  return publicToken ? (<PlaidAuth publicToken={publicToken} />) : (
+
+  return publicToken ? (
+    <>
+      <PlaidAuth publicToken={publicToken} />
+      <Transactions publicToken={publicToken} />
+    </>
+  ) : (
     <button onClick={() => open()} disabled={!ready}>
       Connect a bank account
     </button>
-
-);
+  );
 }
 
-function PlaidAuth({publicToken}) {
+function PlaidAuth({ publicToken }) {
   const [account, setAccount] = useState();
 
   useEffect(() => {
     async function fetchData() {
+      try {
+        const accessTokenResponse = await axios.post("/exchange_public_token", { public_token: publicToken });
+        console.log("accessToken", accessTokenResponse.data.accessToken);
 
-      let accessToken = await axios.post("/exchange_public_token", {public_token: publicToken});
-      console.log("accessToken", accessToken.data);
+        const authResponse = await axios.post("/auth", { access_token: accessTokenResponse.data.accessToken });
+        console.log("auth data ", authResponse.data);
 
-      const auth = await axios.post("/auth", {access_token: accessToken.data.accessToken});
-
-      console.log("auth data ", auth.data);
-      setAccount(auth.data.numbers.ach[0]);
+        setAccount(authResponse.data.numbers.ach[0]);
+      } catch (error) {
+        console.error(error);
+      }
     }
     fetchData();
   }, []);
+
   return account && (
-      <>
-        <p>Account number: {account.account}</p>
-        <p>Routing number: {account.routing}</p>
-      </>
+    <>
+      <p>Account number: {account.account}</p>
+      <p>Routing number: {account.routing}</p>
+    </>
   );
 }
+
+function Transactions({ publicToken }) {
+  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchTransactions = async () => {
+    try {
+      setIsLoading(true);
+      const accessTokenResponse = await axios.post("/exchange_public_token", {
+        public_token: publicToken,
+      });
+      console.log("accessToken", accessTokenResponse.data.accessToken);
+
+      const transactionsResponse = await axios.post("/transactions", {
+        access_token: accessTokenResponse.data.accessToken,
+      });
+      console.log("transactions data ", transactionsResponse.data);
+
+      setTransactions(transactionsResponse.data.transactions);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const clearTransactions = () => {
+    setTransactions([]);
+  };
+
+  return (
+    <>
+    <button onClick={fetchTransactions} disabled={isLoading}>
+      Get Transactions
+    </button>
+    <button onClick={clearTransactions} disabled={isLoading || transactions.length === 0}>
+      Clear Transactions
+    </button>
+    {isLoading && <p>Loading...</p>}
+{transactions.length > 0 ? (
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Category</th>
+        <th>Merchant</th>
+        <th>Description</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {transactions.map((transaction) => (
+        <tr key={transaction.transaction_id}>
+          <td>{transaction.date}</td>
+          <td>{transaction.category}</td>
+          <td>{transaction.merchant_name}</td>
+          <td>{transaction.name}</td>
+          <td>{transaction.amount}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+) : (
+  <p>No transactions available</p>
+)}
+  </>
+  );
+}
+
 
 
 

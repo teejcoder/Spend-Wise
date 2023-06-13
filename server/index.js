@@ -9,8 +9,7 @@ const configuration = new Configuration({
   baseOptions: {
     headers: {
         'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
-        'PLAID-SECRET': process.env.PLAID_SECRET,
-        'PLAID-PRODUCTS': process.env.PLAID_PRODUCTS,
+        'PLAID-SECRET': process.env.PLAID_SECRET
     },
   },
 });
@@ -70,27 +69,30 @@ app.post('/exchange_public_token', async function (
         });
         // These values should be saved to a persistent database and
         // associated with the currently signed-in user
+
         const accessToken = plaidResponse.data.access_token;
         response.json({ accessToken });
     } catch (error) {
-        response.status(500).send("failed");
+        console.log(error)
     }
 });
 
-app.post('/transactions', async function (
-    request, response) {
-        const transactions = request.data.transactions;
-        try {
-            const response = await plaidClient.transactionsGet({
-                transactionsGet: transactions,
-            })
-
-            const accessToken = transactions.data.transactions;
-            response.json({ transactions })
-        } catch(error){
-            console.log(error)
-        }
-    });
+app.post('/transactions', async function (request, response) {
+    const accessToken = request.body.access_token;
+    try {
+      const transactionsResponse = await plaidClient.transactionsGet({
+        access_token: accessToken,
+        start_date: '2023-01-01',
+        end_date: '2023-06-30',
+      });
+  
+      const transactions = transactionsResponse.data.transactions;
+      response.json({ transactions });
+    } catch (error) {
+      console.log(error);
+      response.status(500).send("failed");
+    }
+  });
 
 app.listen(3000, () => {
     console.log("Server is running, on 3000 you better catch it!");
