@@ -10,7 +10,7 @@ const configuration = new Configuration({
     headers: {
         'PLAID-CLIENT-ID': process.env.PLAID_CLIENT_ID,
         'PLAID-SECRET': process.env.PLAID_SECRET,
-        'PLAID-PRODUCTS': process.env.PLAID_PRODUCTS
+        'PLAID-PRODUCTS': process.env.PLAID_PRODUCTS,
     },
   },
 });
@@ -31,8 +31,8 @@ app.post('/create_link_token', async function (request, response) {
         user: {
             client_user_id: 'user',
         },
-        client_name: 'Plaid Test App',
-        products: ['auth'],
+        client_name: 'Spend Wise',
+        products: ['auth', 'transactions'],
         language: 'en',
         redirect_uri: 'http://localhost:3001',
         country_codes: ['US'],
@@ -77,60 +77,20 @@ app.post('/exchange_public_token', async function (
     }
 });
 
+app.post('/transactions', async function (
+    request, response) {
+        const transactions = request.data.transactions;
+        try {
+            const response = await plaidClient.transactionsGet({
+                transactionsGet: transactions,
+            })
 
-transactions: async (request, response) => {
-    try {
-      const now = moment();
-      const today = now.format("YYYY-MM-DD");
-      const thirtyDaysAgo = now
-        .subtract(30 * request.body.month, "days")
-        .format("YYYY-MM-DD");
-      let transactions = [];
-      const items = request.body.account;
-      const requests = items.map(async (item) => {
-        let accessToken = item.accessToken;
-        let institutionName = item.institutionName;
-        const req = {
-          access_token: accessToken,
-          start_date: thirtyDaysAgo,
-          end_date: today,
-        };
-        const res = await plaidClient.transactionsGet(req);
-        transactions.push({
-          accountName: institutionName,
-          transactions: res.data.transactions,
-          totalTransactions: res.data.total_transactions,
-        });
-      });
-      // requests is an array of promises. Wait for all of them to complete:
-      await Promise.all(requests);
-      response.json(transactions);
-      // transactions is now full.
-
-      // items.forEach((item) => {
-      //   let accessToken = item.accessToken;
-      //   let institutionName = item.institutionName;
-      //   const req = {
-      //     access_token: accessToken,
-      //     start_date: thirtyDaysAgo,
-      //     end_date: today,
-      //   };
-      //   plaidClient.transactionsGet(req).then((res) => {
-      //     transactions.push({
-      //       accountName: institutionName,
-      //       transactions: res.data.transactions,
-      //     });
-      //     if (transactions.length === items.length) {
-      //       response.json(transactions);
-      //     }
-      //   });
-      // });
-    } catch (err) {
-      response.status(500).json({ message: "Could not fetch transaction" });
-    }
-};
-
-
+            const accessToken = transactions.data.transactions;
+            response.json({ transactions })
+        } catch(error){
+            console.log(error)
+        }
+    });
 
 app.listen(3000, () => {
     console.log("Server is running, on 3000 you better catch it!");

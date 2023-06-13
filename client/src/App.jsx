@@ -1,5 +1,3 @@
-
-// import './App.css';
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { usePlaidLink } from 'react-plaid-link';
@@ -7,12 +5,9 @@ import { usePlaidLink } from 'react-plaid-link';
 axios.defaults.baseURL = "http://localhost:3000"
 
 
-
 function App() {
   const [linkToken, setLinkToken] = useState();
   const [publicToken, setPublicToken] = useState();
-
-  const [transactions, setTransactions] = useState([]);
 
     useEffect(() => {
 
@@ -39,9 +34,6 @@ function App() {
 );
 }
 
-
-
-
 function PlaidAuth({publicToken}) {
   const [account, setAccount] = useState();
 
@@ -65,10 +57,6 @@ function PlaidAuth({publicToken}) {
       </>
   );
 }
-
-
-
-
 
 
 
