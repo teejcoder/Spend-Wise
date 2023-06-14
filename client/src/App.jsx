@@ -29,7 +29,8 @@ function App() {
     <>
       <PlaidAuth publicToken={publicToken} />
       <Transactions publicToken={publicToken} />
-      <Balance publicToken={publicToken} />
+      {/* <Balance publicToken={publicToken} />
+      <Accounts publicToken={publicToken} /> */}
     </>
   ) : (
     <button onClick={() => open()} disabled={!ready}>
@@ -135,60 +136,84 @@ function Transactions({ publicToken }) {
 }
 
 
-function Balance ({ publicToken }) {
-  const [balance, setBalance] = useState([]);
-  const [isLoading, setIsLoading] = useState();
-  
 
-  const fetchBalance = async () => {
-    try {
-      setIsLoading(true);
-      const accessTokenResponse = await axios.post("/exchange_public_token", {
-        public_token: publicToken,
-      });
-      console.log("accessToken", accessTokenResponse.data.accessToken);
+// function Balance({ publicToken }) {
+//   const [balance, setBalance] = useState([]);
+//   const [isLoading, setIsLoading] = useState(false);
 
-      const balanceResponse = await axios.get("/balance", {
-        access_token: accessTokenResponse.data.accessToken,
-      });
-      console.log("balance data", balanceResponse.data.balance);
+//   const fetchBalance = async () => {
+//     try {
+//       setIsLoading(true);
+//       const accessTokenResponse = await axios.post('/exchange_public_token', {
+//         public_token: publicToken,
+//       });
+//       console.log('accessToken', accessTokenResponse.data.accessToken);
 
-      setBalance(balanceResponse.data.balance);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+//       const balanceResponse = await axios.get('/balance', {
+//         params: {
+//           access_token: accessTokenResponse.data.accessToken,
+//         },
+//       });
+//       console.log('balance data', balanceResponse.data);
 
-  const clearBalance = () => {
-    setBalance(null);
-  };
+//       setBalance(balanceResponse.data.balance);
+//     } catch (error) {
+//       console.error(error);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
 
-  return (
-    <>
-      <button onClick={fetchBalance} disabled={isLoading}>
-        Get Balance
-      </button>
-      <button onClick={clearBalance} disabled={isLoading || !balance}>
-        Clear Balance
-      </button>
-      {isLoading && <p>Loading...</p>}
-      {balance.length > 0 ? (
-      <div>
-        <h3>Balance</h3>
-        {balance.map((item, index) => (
-          <p key={index}>{item.balance}</p>
-        ))}
-      </div>
-    ) : (
-  <p>No balance available</p>
-  )}
-    </>
-  );
-}
+//   const clearBalance = () => {
+//     setBalance([]);
+//   };
+
+//   return (
+//     <>
+//       <button onClick={fetchBalance} disabled={isLoading}>
+//         Get Balance
+//       </button>
+//       <button onClick={clearBalance} disabled={isLoading || balance.length === 0}>
+//         Clear Balance
+//       </button>
+//       {isLoading && <p>Loading...</p>}
+//       {balance.length > 0 ? (
+//         <div>
+//           <h3>Balance</h3>
+//           {balance.map((item, index) => (
+//             <p key={index}>{item.balance}</p>
+//           ))}
+//         </div>
+//       ) : (
+//         <p>No balance available</p>
+//       )}
+//     </>
+//   );
+// }
 
 
+// function Accounts() {
+//   const [account, setAccount] = useState(null);
+//   const [user, setUser] = useState(null);
 
+//   useEffect(() => {
+//     let ignore = false;
+
+//     async function fetchAccounts() {
+//       const accounts = await axios.post('/accounts');
+//       if (!ignore) {
+//         setAccount(accounts.data);
+//       }
+//     }
+
+//     if (user) {
+//       fetchAccounts();
+//       return () => {
+//         ignore = true;
+//       };
+//     }
+//   }, [user]);
+
+// }
 
 export default App;

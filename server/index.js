@@ -16,7 +16,9 @@ const configuration = new Configuration({
 
 
 const plaidClient = new PlaidApi(configuration);
+
 const app = express();
+
 app.use(cors());
 app.use(bodyParser.json())
 
@@ -44,19 +46,6 @@ app.post('/create_link_token', async function (request, response) {
     }
 });
 
-app.post("/auth", async function(request, response) {
-    try {
-        const access_token = request.body.access_token;
-        const plaidRequest = {
-            access_token: access_token,
-        };
-        const plaidResponse = await plaidClient.authGet(plaidRequest);
-        response.json(plaidResponse.data);
-    } catch (e) {
-        response.status(500).send("failed");
-    }
- });
-
 app.post('/exchange_public_token', async function (
     request,
     response,
@@ -77,6 +66,34 @@ app.post('/exchange_public_token', async function (
     }
 });
 
+app.post("/auth", async function(request, response) {
+    try {
+        const access_token = request.body.access_token;
+        const plaidRequest = {
+            access_token: access_token,
+        };
+        const plaidResponse = await plaidClient.authGet(plaidRequest);
+        response.json(plaidResponse.data);
+    } catch (e) {
+        response.status(500).send("failed");
+    }
+});
+
+// get accounts 
+// app.get('/accounts', async function (request, response, next) {
+//     try {
+//       const accountsResponse = await client.accountsGet({
+//         access_token: accessToken,
+//       });
+//       prettyPrintResponse(accountsResponse);
+//       response.json(accountsResponse.data);
+//     } catch (error) {
+//       prettyPrintResponse(error);
+//       return response.json(formatError(error.response));
+//     }
+//   });
+
+//get transactions
 app.post('/transactions', async function (request, response) {
     const accessToken = request.body.access_token;
     try {
@@ -95,25 +112,22 @@ app.post('/transactions', async function (request, response) {
 });
 
 
-// Pull real-time balance information for each account associated with the Item
-app.get('/balance', async function (request, response) {
-    const accessToken = request.body.access_token;
-    try {
-        const balanceResponse = await plaidClient.balanceGet({
-            access_token: accessToken,
-            id: _id,
-            bank: institutionName,
-            accountName: account.name,
-            balance: account.balances,
-            type: account.type,
-        });
-    const balance = balanceResponse.data.balance;
-    response.json({ balance });
-    } catch (err) {
-    console.log(err)
-    response.status(500).json({ message: "Failed to get balance" });    
-    }
-});
+// // Pull real-time balance information for each account associated with the Item
+// app.post('/balance', async function (request, response) {
+//     const accessToken = request.body.access_token;
+//     try {
+//         const balanceResponse = await plaidClient.balanceGet({
+//             access_token: accessToken
+//         });
+//     const balance = balanceResponse.data.balance;
+//     response.json({ balance });
+//     } catch (err) {
+//     console.log(err)
+//     response.status(500).json({ message: "Failed to get balance" });    
+//     }
+// });
+
+
 
 
 app.listen(3000, () => {
