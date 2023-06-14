@@ -14,7 +14,6 @@ const configuration = new Configuration({
   },
 });
 
-
 const plaidClient = new PlaidApi(configuration);
 
 const app = express();

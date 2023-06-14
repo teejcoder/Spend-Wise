@@ -29,8 +29,8 @@ function App() {
     <>
       <PlaidAuth publicToken={publicToken} />
       <Transactions publicToken={publicToken} />
-      {/* <Balance publicToken={publicToken} />
-      <Accounts publicToken={publicToken} /> */}
+      {/* <Balance publicToken={publicToken} /> */}
+      {/* <Accounts publicToken={publicToken} /> */}
     </>
   ) : (
     <button onClick={() => open()} disabled={!ready}>
@@ -51,21 +51,41 @@ function PlaidAuth({ publicToken }) {
         const authResponse = await axios.post("/auth", { access_token: accessTokenResponse.data.accessToken });
         console.log("auth data ", authResponse.data);
 
-        setAccount(authResponse.data.numbers.ach[0]);
+        const accountData = authResponse.data.accounts[0];
+        const { name, balances, subtype, account_id } = accountData;
+
+        setAccount({ name, balances, subtype, account_id });
       } catch (error) {
         console.error(error);
       }
     }
     fetchData();
-  }, []);
+  }, [publicToken]);
+
+
+
+
+  const handleConnectAnotherAccount = () => {
+    
+    console.log("Connect another account");
+  };
 
   return account && (
     <>
-      <p>Account number: {account.account}</p>
-      <p>Routing number: {account.routing}</p>
+      <button onClick={handleConnectAnotherAccount}>
+        Connect Another Account
+      </button>
+      <p>Account name: {account.name}</p>
+      <p>Account account number: {account.account_id}</p>
+      <p>Balance: {account.balances.current}</p>
+      <p>Subtype: {account.subtype}</p>
     </>
   );
 }
+
+/////////////////////////////////////////////////////////////////////
+//// TRANSACTION COMPONENT
+/////////////////////////////////////////////////////////////////////
 
 function Transactions({ publicToken }) {
   const [transactions, setTransactions] = useState([]);
@@ -74,11 +94,13 @@ function Transactions({ publicToken }) {
   const fetchTransactions = async () => {
     try {
       setIsLoading(true);
+
+      //retrieve token
       const accessTokenResponse = await axios.post("/exchange_public_token", {
         public_token: publicToken,
       });
       console.log("accessToken", accessTokenResponse.data.accessToken);
-
+      //send token
       const transactionsResponse = await axios.post("/transactions", {
         access_token: accessTokenResponse.data.accessToken,
       });
@@ -137,6 +159,8 @@ function Transactions({ publicToken }) {
 
 
 
+
+// balance componenet
 // function Balance({ publicToken }) {
 //   const [balance, setBalance] = useState([]);
 //   const [isLoading, setIsLoading] = useState(false);
@@ -192,6 +216,11 @@ function Transactions({ publicToken }) {
 // }
 
 
+export default App;
+
+
+
+
 // function Accounts() {
 //   const [account, setAccount] = useState(null);
 //   const [user, setUser] = useState(null);
@@ -216,4 +245,4 @@ function Transactions({ publicToken }) {
 
 // }
 
-export default App;
+
