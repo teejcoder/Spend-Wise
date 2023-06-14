@@ -29,6 +29,7 @@ function App() {
     <>
       <PlaidAuth publicToken={publicToken} />
       <Transactions publicToken={publicToken} />
+      <Balance publicToken={publicToken} />
     </>
   ) : (
     <button onClick={() => open()} disabled={!ready}>
@@ -130,6 +131,60 @@ function Transactions({ publicToken }) {
   <p>No transactions available</p>
 )}
   </>
+  );
+}
+
+
+function Balance ({ publicToken }) {
+  const [balance, setBalance] = useState([]);
+  const [isLoading, setIsLoading] = useState();
+  
+
+  const fetchBalance = async () => {
+    try {
+      setIsLoading(true);
+      const accessTokenResponse = await axios.post("/exchange_public_token", {
+        public_token: publicToken,
+      });
+      console.log("accessToken", accessTokenResponse.data.accessToken);
+
+      const balanceResponse = await axios.get("/balance", {
+        access_token: accessTokenResponse.data.accessToken,
+      });
+      console.log("balance data", balanceResponse.data.balance);
+
+      setBalance(balanceResponse.data.balance);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const clearBalance = () => {
+    setBalance(null);
+  };
+
+  return (
+    <>
+      <button onClick={fetchBalance} disabled={isLoading}>
+        Get Balance
+      </button>
+      <button onClick={clearBalance} disabled={isLoading || !balance}>
+        Clear Balance
+      </button>
+      {isLoading && <p>Loading...</p>}
+      {balance.length > 0 ? (
+      <div>
+        <h3>Balance</h3>
+        {balance.map((item, index) => (
+          <p key={index}>{item.balance}</p>
+        ))}
+      </div>
+    ) : (
+  <p>No balance available</p>
+  )}
+    </>
   );
 }
 

@@ -82,7 +82,7 @@ app.post('/transactions', async function (request, response) {
     try {
       const transactionsResponse = await plaidClient.transactionsGet({
         access_token: accessToken,
-        start_date: '2023-01-01',
+        start_date: '2022-01-01',
         end_date: '2023-06-30',
       });
   
@@ -92,7 +92,29 @@ app.post('/transactions', async function (request, response) {
       console.log(error);
       response.status(500).send("failed");
     }
-  });
+});
+
+
+// Pull real-time balance information for each account associated with the Item
+app.get('/balance', async function (request, response) {
+    const accessToken = request.body.access_token;
+    try {
+        const balanceResponse = await plaidClient.balanceGet({
+            access_token: accessToken,
+            id: _id,
+            bank: institutionName,
+            accountName: account.name,
+            balance: account.balances,
+            type: account.type,
+        });
+    const balance = balanceResponse.data.balance;
+    response.json({ balance });
+    } catch (err) {
+    console.log(err)
+    response.status(500).json({ message: "Failed to get balance" });    
+    }
+});
+
 
 app.listen(3000, () => {
     console.log("Server is running, on 3000 you better catch it!");
