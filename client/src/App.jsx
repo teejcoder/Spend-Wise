@@ -8,6 +8,7 @@ axios.defaults.baseURL = "http://localhost:3000"
 function App() {
   const [linkToken, setLinkToken] = useState();
   const [publicToken, setPublicToken] = useState();
+  
 
   useEffect(() => {
     async function fetchLinkToken() {
@@ -61,7 +62,7 @@ function PlaidAuth({ publicToken }) {
     }
     fetchData();
   }, [publicToken]);
-  
+
   return account && (
     <>
 
