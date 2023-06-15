@@ -61,20 +61,10 @@ function PlaidAuth({ publicToken }) {
     }
     fetchData();
   }, [publicToken]);
-
-
-
-
-  const handleConnectAnotherAccount = () => {
-    
-    console.log("Connect another account");
-  };
-
+  
   return account && (
     <>
-      <button onClick={handleConnectAnotherAccount}>
-        Connect Another Account
-      </button>
+
       <p>Account name: {account.name}</p>
       <p>Account account number: {account.account_id}</p>
       <p>Balance: {account.balances.current}</p>
