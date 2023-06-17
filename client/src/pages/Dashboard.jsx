@@ -1,12 +1,13 @@
 import axios from "axios";
 import { usePlaidLink } from 'react-plaid-link';
 import React, { useState, useEffect } from 'react';
+import Navbar from "../components/Navbar";
+import Sidebar from "../components/Sidebar";
 
 function Dashboard() {
   const [linkToken, setLinkToken] = useState();
   const [publicToken, setPublicToken] = useState();
   
-
   useEffect(() => {
     async function fetchLinkToken() {
       const response = await axios.post("/create_link_token");
@@ -39,7 +40,7 @@ function Dashboard() {
 
 function PlaidAuth({ publicToken }) {
   const [account, setAccount] = useState();
-
+  
   useEffect(() => {
     async function fetchData() {
       try {
@@ -59,9 +60,19 @@ function PlaidAuth({ publicToken }) {
     }
     fetchData();
   }, [publicToken]);
+  
+
 
   return account && (
     <>
+      <Navbar />
+      <Sidebar />
+      <div>
+        {/* <img src={profile.picture} alt="user image" />
+        <p>Hi, {profile.given_name}</p> */}
+        <br />
+        {/* <button onClick={logOut}>Log out</button> */}
+      </div>
 
       <p>Account name: {account.name}</p>
       <p>Account account number: {account.account_id}</p>
