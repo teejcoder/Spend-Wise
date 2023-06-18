@@ -54,16 +54,10 @@ function App() {
 
     return (
         <>
-            <Navbar />
-
-            <div className="login">
-                <section className="loginHero">
-
-                    <button className="gmailSignin" onClick={() => login()}>Sign in with Google 🚀 </button>
-
-                </section>
-            </div>
-
+            <section className="loginHero">
+                <img className="loginLogo" src="/assets/spend-wise-logo.png" alt="spend-wise-logo" />
+                <button className="gmailSignin" onClick={() => login()}>Sign in with Google 🚀 </button>
+            </section>
         </>
     )
 

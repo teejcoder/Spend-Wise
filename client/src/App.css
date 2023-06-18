@@ -188,34 +188,32 @@ template {
 *************** LOGIN HERO
 **********************************************************************/
 
-.login {
+.loginHero {
   height: 92vh;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 }
 
-.loginHero {
-  height: 80%;
-  width: 80%;
-  border: 1px solid black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.loginLogo {
+  height: 250px;
+  width: 250px;
+  margin-bottom: 10px;
 }
 
 button {
-  height: 80px;
-  width: 300px;
-  font-family: Georgia, 'Times New Roman', Times, serif;
-  background-color: aquamarine;
+  font-family: "Roboto";
+  width: 200px;
+  padding: 10px;
+  font-family: sans-serif;
+  color:  white;
+  background-color: #4285F4;
   border: 0;
-  border-radius: 50px;
+  border-radius: 4px;
   cursor: pointer;
 }
-
-
 
 
 
@@ -227,6 +225,15 @@ button {
 .navBar {
   height: 8vh;
   border: 1px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  height: 70px;
+  width: 70px;
+  border-radius: 50px;
 }
 
 
