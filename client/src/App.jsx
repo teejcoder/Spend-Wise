@@ -1,9 +1,7 @@
 import "./App.css";
 import axios from "axios";
-import Navbar from "./components/Navbar";
 import React, { useState, useEffect } from 'react';
-import { googleLogout, useGoogleLogin } from '@react-oauth/google';
-
+import { useGoogleLogin } from '@react-oauth/google';
 
 axios.defaults.baseURL = "http://localhost:3000"
 
@@ -21,17 +19,17 @@ function App() {
         () => {
             if (user) {
                 axios
-                    .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
-                        headers: {
-                            Authorization: `Bearer ${user.access_token}`,
-                            Accept: 'application/json'
-                        }
-                    })
-                    .then((res) => {
-                      console.log(res.data)
-                      setProfile(res.data);
-                    })
-                    .catch((err) => console.log(err));
+                .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
+                    headers: {
+                        Authorization: `Bearer ${user.access_token}`,
+                        Accept: 'application/json'
+                    }
+                })
+                .then((res) => {
+                  console.log(res.data)
+                  setProfile(res.data);
+                })
+                .catch((err) => console.log(err));
             }
         },
         [ user ]
