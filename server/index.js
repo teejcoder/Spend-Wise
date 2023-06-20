@@ -126,9 +126,6 @@ app.post('/transactions', async function (request, response) {
 //     }
 // });
 
-
-
-
 app.listen(3000, () => {
     console.log("Server is running, on 3000 you better catch it!");
 });
