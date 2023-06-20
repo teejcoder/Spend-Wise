@@ -6,7 +6,6 @@ import { useGoogleLogin, googleLogout } from '@react-oauth/google';
 axios.defaults.baseURL = "http://localhost:3000"
 
 function App() {
-
         const [ user, setUser ] = useState([]);
         const [ profile, setProfile ] = useState([]);
       
@@ -26,8 +25,8 @@ function App() {
                             }
                         })
                         .then((res) => {
+                            setProfile(res.data);
                           console.log(res.data)
-                          setProfile(res.data);
                         })
                         .catch((err) => console.log(err));
                 }
@@ -47,16 +46,21 @@ function App() {
                 <br />
                 <br />
       
-                    <div>
-                        <img src={profile.picture} alt="user image" />
-                        <p>Hi, {profile.given_name}</p>
-                        <br />
-                        <button onClick={logOut}>Log out</button>
-                    </div>
-      
-                    <button onClick={() => login()}>Sign in with Google 🚀 </button>
-      
-            </div>
+                
+
+    <div>
+      {/* <img src={profile.picture} alt="user image" />
+      <p>Hi, {profile.given_name}</p> */}
+      <br />
+      <button onClick={logOut}>Log out</button>
+    </div>
+
+    <div>
+      <button onClick={() => login()}>Sign in with Google 🚀</button>
+    </div>
+  
+
+        </div>
         );
 
 };

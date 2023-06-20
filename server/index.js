@@ -4,6 +4,12 @@ const bodyParser = require("body-parser");
 require("dotenv").config({ path: "./config/.env" });
 const { Configuration, PlaidApi, PlaidEnvironments } = require('plaid');
 
+
+app.post('/hello', (request, response) => {
+    response.json({message: "Hello " + request.body.name});
+});
+
+
 const configuration = new Configuration({
   basePath: PlaidEnvironments.sandbox,
   baseOptions: {
@@ -22,9 +28,7 @@ app.use(cors());
 app.use(bodyParser.json())
 
 
-app.post('/hello', (request, response) => {
-    response.json({message: "Hello " + request.body.name});
-});
+
 
 app.post('/create_link_token', async function (request, response) {
     const plaidRequest = {
